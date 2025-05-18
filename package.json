@@ -1,0 +1,9 @@
+{
+  "name": "pytest-inside-pyodide-repro",
+  "module": "main.js",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "pyodide": "0.26"
+  }
+}

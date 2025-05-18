@@ -1,0 +1,55 @@
+name: Reproduction
+
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu, windows, macos]
+        runtime: [node, bun, deno]
+        pyodide_version: [0.26, 0.27]
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: matrix.runtime == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Setup Bun
+        if: matrix.runtime == 'bun'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Setup Deno
+        if: matrix.runtime == 'deno'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install dependencies (Node)
+        if: matrix.runtime == 'node'
+        run: npm install pyodide@${{ matrix.pyodide_version }}
+
+      - name: Install dependencies (Bun)
+        if: matrix.runtime == 'bun'
+        run: bun install pyodide@${{ matrix.pyodide_version }}
+
+      - name: Install pyodide version (Node)
+        if: matrix.runtime == 'node'
+        run: npm install pyodide@${{ matrix.pyodide_version }}
+
+      - name: Run with Node
+        if: matrix.runtime == 'node'
+        run: node main.js
+
+      - name: Run with Bun
+        if: matrix.runtime == 'bun'
+        run: bun main.js
+        timeout-minutes: 1
+
+      - name: Run with Deno
+        if: matrix.runtime == 'deno'
+        run: deno -A main.js
